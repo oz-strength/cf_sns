@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -60,7 +60,11 @@ export class PostsController {
   // id에 해당하는 post를 반환하는 API
   @Get(':id')
   getPostById(@Param('id') id: string) {
-    return posts.find((post) => post.id === +id);
+    const post = posts.find((post) => post.id === +id);
+    if (!post) {
+      throw new NotFoundException();
+    }
+    return post;
   }
 
   // 3. POST /posts
