@@ -17,11 +17,11 @@ interface Post {
   commentCount: number;
 }
 
-@Controller()
+@Controller('api/v1')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get('post')
   getPost(): Post {
     return {
       author: 'John Doe',
