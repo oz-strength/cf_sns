@@ -20,32 +20,32 @@ export interface PostModel {
   commentCount: number;
 }
 
-let posts: PostModel[] = [
-  {
-    id: 1,
-    author: 'John Doe',
-    title: 'Hello World',
-    content: 'This is my first post!',
-    likeCount: 100,
-    commentCount: 20,
-  },
-  {
-    id: 2,
-    author: 'Jane Smith',
-    title: 'My Second Post',
-    content: 'This is another post.',
-    likeCount: 50,
-    commentCount: 10,
-  },
-  {
-    id: 3,
-    author: 'Bob Johnson',
-    title: 'My Third Post',
-    content: 'This is my third post.',
-    likeCount: 75,
-    commentCount: 15,
-  },
-];
+// let posts: PostModel[] = [
+//   {
+//     id: 1,
+//     author: 'John Doe',
+//     title: 'Hello World',
+//     content: 'This is my first post!',
+//     likeCount: 100,
+//     commentCount: 20,
+//   },
+//   {
+//     id: 2,
+//     author: 'Jane Smith',
+//     title: 'My Second Post',
+//     content: 'This is another post.',
+//     likeCount: 50,
+//     commentCount: 10,
+//   },
+//   {
+//     id: 3,
+//     author: 'Bob Johnson',
+//     title: 'My Third Post',
+//     content: 'This is my third post.',
+//     likeCount: 75,
+//     commentCount: 15,
+//   },
+// ];
 
 @Injectable()
 export class PostsService {
@@ -71,12 +71,12 @@ export class PostsService {
     return post;
   }
 
-  async createPost(author: string, title: string, content: string) {
+  async createPost(authorId: number, title: string, content: string) {
     // 1) create -> 저장할 객체를 생성한다.
     // 2) save -> 실제로 데이터베이스에 저장한다.
 
     const post = this.postsRepository.create({
-      author,
+      author: { id: authorId },
       title,
       content,
       likeCount: 0,
@@ -87,12 +87,7 @@ export class PostsService {
     return newPost;
   }
 
-  async updatePost(
-    postId: number,
-    author?: string,
-    title?: string,
-    content?: string,
-  ) {
+  async updatePost(postId: number, title?: string, content?: string) {
     // save의 기능
     // 1) id가 존재하는 경우 -> update
     // 2) id가 존재하지 않는 경우 -> create
@@ -106,9 +101,6 @@ export class PostsService {
       throw new NotFoundException();
     }
 
-    if (author) {
-      post.author = author;
-    }
     if (title) {
       post.title = title;
     }
