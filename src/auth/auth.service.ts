@@ -55,7 +55,7 @@ export class AuthService {
   loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
     return {
       accessToken: this.signToken(user, false),
-      refreshToken: this.signToken(user, false),
+      refreshToken: this.signToken(user, true),
     };
   }
 
@@ -99,7 +99,10 @@ export class AuthService {
   ) {
     const hash = await bcrypt.hash(user.password, HASH_ROUNDS);
 
-    const newUser = await this.usersService.createUser(user);
+    const newUser = await this.usersService.createUser({
+      ...user,
+      password: hash,
+    });
 
     return this.loginUser(newUser);
   }
