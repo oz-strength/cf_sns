@@ -4,6 +4,15 @@ import * as bcrypt from 'bcrypt';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { HASH_ROUNDS, JWT_SECRET } from './const/auth.const';
+
+type TokenPayload = {
+  email: string;
+  sub: number;
+  type: 'access' | 'refresh';
+};
+
+type TokenUser = Pick<UsersModel, 'email' | 'id'>;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -83,6 +92,38 @@ export class AuthService {
   }
 
   /**
+   * 토큰 검증
+   */
+  verifyToken(token: string) {
+    return this.jwtService.verify<TokenPayload>(token, {
+      secret: JWT_SECRET,
+    });
+  }
+
+  rotateToken(token: string, isRefreshToken: boolean) {
+    const decoded = this.verifyToken(token);
+
+    /**
+     * sub: id,
+     * email: email,
+     * type: 'access' | 'refresh'
+     */
+    if (decoded.type !== 'refresh') {
+      throw new UnauthorizedException(
+        '토큰 재발급은 Refresh 토큰으로만 가능합니다!',
+      );
+    }
+
+    return this.signToken(
+      {
+        email: decoded.email,
+        id: decoded.sub,
+      },
+      isRefreshToken,
+    );
+  }
+
+  /**
    * 우리가 만드려는 기능
    *
    * 1) registerWithEmail
@@ -111,7 +152,7 @@ export class AuthService {
    * 2) sub -> id
    * 3) type -> 'access' | 'refresh'
    */
-  signToken(user: Pick<UsersModel, 'email' | 'id'>, isRefreshToken: boolean) {
+  signToken(user: TokenUser, isRefreshToken: boolean) {
     const payload = {
       email: user.email,
       sub: user.id,
@@ -124,7 +165,7 @@ export class AuthService {
     });
   }
 
-  loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
+  loginUser(user: TokenUser) {
     return {
       accessToken: this.signToken(user, false),
       refreshToken: this.signToken(user, true),

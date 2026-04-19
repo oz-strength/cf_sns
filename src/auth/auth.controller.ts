@@ -5,8 +5,38 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // refresh 토큰으로 access 토큰 재발급
+  @Post('token/access')
+  postTokenAccess(@Headers('authorization') rawToken: string) {
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
+
+    const newToken = this.authService.rotateToken(token, false);
+
+    /**
+     * {accessToken: {token}}
+     */
+    return {
+      accessToken: newToken,
+    };
+  }
+
+  // refresh 토큰으로 refresh 토큰 재발급
+  @Post('token/refresh')
+  postTokenRefresh(@Headers('authorization') rawToken: string) {
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
+
+    const newToken = this.authService.rotateToken(token, true);
+
+    /**
+     * {refreshToken: {token}}
+     */
+    return {
+      refreshToken: newToken,
+    };
+  }
+
   @Post('login/email')
-  loginEmail(@Headers('authorization') rawToken: string) {
+  postLoginEmail(@Headers('authorization') rawToken: string) {
     // email:password -> base64
     // aasdfklj'lwaeklfasjdl'f -> email:password
     const token = this.authService.extractTokenFromHeader(rawToken, false);
@@ -17,7 +47,7 @@ export class AuthController {
   }
 
   @Post('register/email')
-  registerEmail(
+  postRegisterEmail(
     @Body('nickname') nickname: string,
     @Body('email') email: string,
     @Body('password') password: string,
