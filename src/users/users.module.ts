@@ -6,6 +6,7 @@ import { UsersService } from './users.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([UsersModel])], // Repository를 DI 컨테이너에 등록
+  exports: [UsersService],
   controllers: [UsersController],
   providers: [UsersService],
 })
