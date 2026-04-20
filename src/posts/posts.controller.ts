@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -23,8 +24,8 @@ export class PostsController {
   // 2. GET /posts/:id
   // id에 해당하는 post를 반환하는 API
   @Get(':id')
-  getPostById(@Param('id') id: string) {
-    return this.postsService.getPostById(+id);
+  getPost(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.getPostById(id);
   }
 
   // 3. POST /posts
@@ -42,17 +43,17 @@ export class PostsController {
   // id에 해당하는 post의 내용을 수정하는 API
   @Patch(':id')
   patchPosts(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body('title') title?: string,
     @Body('content') content?: string,
   ) {
-    return this.postsService.updatePost(+id, title, content);
+    return this.postsService.updatePost(id, title, content);
   }
 
   // 5. DELETE /posts/:id
   // id에 해당하는 post를 삭제하는 API
   @Delete(':id')
-  deletePost(@Param('id') id: string) {
-    return this.postsService.deletePost(+id);
+  deletePost(@Param('id', ParseIntPipe) id: number) {
+    return this.postsService.deletePost(id);
   }
 }
