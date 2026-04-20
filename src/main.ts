@@ -11,6 +11,8 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true, // transformer의 @Type 없어도 자동으로 변환
       },
+      whitelist: true, // DTO에 정의된 속성만 허용
+      forbidNonWhitelisted: true, // 허용되지 않은 속성이 있으면 에러를 발생시킨다.
     }),
   );
 
