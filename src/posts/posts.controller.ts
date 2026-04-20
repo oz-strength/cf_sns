@@ -12,6 +12,7 @@ import {
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -38,7 +39,7 @@ export class PostsController {
   // DTO - Data Transfer Object
   @Post()
   @UseGuards(AccessTokenGuard)
-  postPosts(
+  postPost(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
     // @Body('title') title: string,
@@ -50,12 +51,13 @@ export class PostsController {
   // 4. PATCH /posts/:id
   // id에 해당하는 post의 내용을 수정하는 API
   @Patch(':id')
-  patchPosts(
+  patchPost(
     @Param('id', ParseIntPipe) id: number,
-    @Body('title') title?: string,
-    @Body('content') content?: string,
+    @Body() body: UpdatePostDto,
+    // @Body('title') title?: string,
+    // @Body('content') content?: string,
   ) {
-    return this.postsService.updatePost(id, title, content);
+    return this.postsService.updatePost(id, body);
   }
 
   // 5. DELETE /posts/:id
