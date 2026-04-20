@@ -7,7 +7,10 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
+import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -31,11 +34,14 @@ export class PostsController {
   // 3. POST /posts
   // 새로운 post를 생성하는 API
   @Post()
+  @UseGuards(AccessTokenGuard)
   postPosts(
-    @Body('authorId') authorId: number,
+    @Request() req: any,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
+    const authorId = req.user.id;
+
     return this.postsService.createPost(authorId, title, content);
   }
 
