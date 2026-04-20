@@ -8,6 +8,9 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // 값을 넣지 않아도 default 값이 형성되게 설정
+      transformOptions: {
+        enableImplicitConversion: true, // transformer의 @Type 없어도 자동으로 변환
+      },
     }),
   );
 
