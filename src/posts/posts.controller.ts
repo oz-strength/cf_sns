@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { User } from 'src/users/decorator/user.decorator';
-import { UsersModel } from 'src/users/entities/users.entity';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -37,11 +36,11 @@ export class PostsController {
   @Post()
   @UseGuards(AccessTokenGuard)
   postPosts(
-    @User() user: UsersModel,
+    @User('id') userId: number,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
-    return this.postsService.createPost(user.id, title, content);
+    return this.postsService.createPost(userId, title, content);
   }
 
   // 4. PATCH /posts/:id
