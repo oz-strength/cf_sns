@@ -5,6 +5,7 @@ import {
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
+import { HOST, PROTOCOL } from './const/env.const';
 import { FILTER_MAPPER } from './const/filter-mapper.const';
 import { BasePaginationDto } from './dto/base-pagination.dto';
 import { BaseModel } from './entity/base.entity';
@@ -41,7 +42,64 @@ export class CommonService {
      *
      * whre__title__ilike
      */
-    const findOptions = this.composeFindOptions(dto);
+    const findOptions = this.composeFindOptions<T>(dto);
+
+    // const results = await repository.find({
+    //   ...findOptions,
+    //   ...overrideFindOptions,
+    // });
+
+    const merged = {
+      ...findOptions,
+      ...overrideFindOptions,
+    };
+
+    console.dir(merged, { depth: 10 });
+
+    const results = await repository.find(merged);
+
+    const lastItem =
+      results.length > 0 && results.length === dto.take // 마지막 페이지즈음에 20개보다 작게 가져오면 다음 페이지 필요없음
+        ? results[results.length - 1]
+        : null;
+
+    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/${path}`);
+
+    if (nextUrl) {
+      /**
+       * dto의 키 값들을 루핑하면서
+       * 키값에 해당되는 밸류가 존재하면
+       * param에 그대로 붙여넣는다.
+       *
+       * 단, where__id_more_than 값만 lastItem의 마지막 값으로 넣어준다.
+       */
+      for (const key of Object.keys(dto)) {
+        if (dto[key]) {
+          if (
+            key !== 'where__id__more_than' &&
+            key !== 'where__id__less_than'
+          ) {
+            nextUrl.searchParams.append(key, dto[key]); // 정렬, 가져올데이터개수는 게속 url에 붙어있어야 한다.
+          }
+        }
+      }
+
+      const key =
+        dto.order__createdAt === 'ASC'
+          ? 'where__id__more_than'
+          : 'where__id__less_than';
+
+      nextUrl.searchParams.append(key, lastItem.id.toString());
+    }
+
+    return {
+      data: results,
+      cursor: {
+        after: lastItem?.id ?? null,
+      },
+      count: results.length,
+      next: nextUrl?.toString() ?? null,
+    };
   }
 
   composeFindOptions<T extends BaseModel>(
@@ -79,7 +137,15 @@ export class CommonService {
     let where: FindOptionsWhere<T> = {};
     let order: FindOptionsOrder<T> = {};
 
+    // value가 undefined 면
+    // where: {
+    //   id: MoreThan(undefined)
+    // } 이런식으로 되어서 에러가 나기 때문에 value가 존재할 때만 where 조건에 추가하도록 한다.
     for (const [key, value] of Object.entries(dto)) {
+      if (value === undefined || value === null) {
+        continue;
+      }
+
       // key: where__id__more_than
       // vlue: 1
       if (key.startsWith('where__')) {
@@ -173,5 +239,30 @@ export class CommonService {
     }
 
     return options;
+  }
+
+  private parseOrderFilter<T extends BaseModel>(
+    key: string,
+    value: unknown,
+  ): FindOptionsOrder<T> {
+    const split = key.split('__');
+
+    if (split.length !== 2) {
+      throw new BadRequestException(
+        `order 필터는 '__' 기준으로 2개의 값으로 나뉘어야 합니다. 현재 key: ${key}`,
+      );
+    }
+
+    const [, field] = split;
+
+    if (value !== 'ASC' && value !== 'DESC') {
+      throw new BadRequestException(
+        `order 값은 ASC 또는 DESC 여야 합니다. 현재 value: ${String(value)}`,
+      );
+    }
+
+    return {
+      [field]: value,
+    } as FindOptionsOrder<T>;
   }
 }
