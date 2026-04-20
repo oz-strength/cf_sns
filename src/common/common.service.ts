@@ -72,7 +72,8 @@ export class CommonService {
       ...overrideFindOptions,
     };
 
-    console.dir(merged, { depth: 10 });
+    // 로깅용으로 합쳐진 옵션을 출력해본다.
+    // console.dir(merged, { depth: 10 });
 
     const results = await repository.find(merged);
 
