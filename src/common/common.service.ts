@@ -41,6 +41,7 @@ export class CommonService {
      *
      * whre__title__ilike
      */
+    const findOptions = this.composeFindOptions(dto);
   }
 
   composeFindOptions<T extends BaseModel>(
@@ -89,7 +90,7 @@ export class CommonService {
       } else if (key.startsWith('order__')) {
         order = {
           ...order,
-          ...this.parseOrderFilter(key, value),
+          ...this.parseWhereFilter(key, value),
         };
       }
     }
@@ -105,7 +106,7 @@ export class CommonService {
   private parseWhereFilter<T extends BaseModel>(
     key: string,
     value: any,
-  ): FindOptionsWhere<T> {
+  ): FindOptionsWhere<T> | FindOptionsOrder<T> {
     const options: FindOptionsWhere<T> = {};
 
     /**
@@ -173,9 +174,4 @@ export class CommonService {
 
     return options;
   }
-
-  private parseOrderFilter<T extends BaseModel>(
-    key: string,
-    value: any,
-  ): FindOptionsWhere<T> {}
 }
