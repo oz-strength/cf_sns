@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { User } from 'src/users/decorator/user.decorator';
+import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
 
 @Controller('posts')
@@ -33,14 +34,17 @@ export class PostsController {
 
   // 3. POST /posts
   // 새로운 post를 생성하는 API
+  //
+  // DTO - Data Transfer Object
   @Post()
   @UseGuards(AccessTokenGuard)
   postPosts(
     @User('id') userId: number,
-    @Body('title') title: string,
-    @Body('content') content: string,
+    @Body() body: CreatePostDto,
+    // @Body('title') title: string,
+    // @Body('content') content: string,
   ) {
-    return this.postsService.createPost(userId, title, content);
+    return this.postsService.createPost(userId, body);
   }
 
   // 4. PATCH /posts/:id
