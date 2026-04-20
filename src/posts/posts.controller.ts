@@ -14,6 +14,7 @@ import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { ImageModelType } from 'src/common/entity/image.entity';
 import { User } from 'src/users/decorator/user.decorator';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { DataSource } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -21,7 +22,10 @@ import { PostsService } from './posts.service';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly dataSource: DataSource,
+  ) {}
 
   // 1. GET /posts
   // 모든 post를 반환하는 API
@@ -58,18 +62,43 @@ export class PostsController {
     // @Body('title') title: string,
     // @Body('content') content: string,
   ) {
-    const post = await this.postsService.createPost(userId, body);
+    // 트랜잭션과 관련된 모든 쿼리를 담당할
+    // 쿼리 러너를 생성한다.
+    const qr = this.dataSource.createQueryRunner();
 
-    for (let i = 0; i < body.images.length; i++) {
-      await this.postsService.createPostImage({
-        post,
-        order: i,
-        path: body.images[i],
-        type: ImageModelType.POST_IMAGE,
-      });
+    // 쿼리 러너에 연결한다.
+    await qr.connect();
+
+    // 트랜잭션을 시작한다.
+    // 이 시점부터  같은 쿼리 러너를 사용하면
+    // 트랜잭션 안에서 데이터베이스 액션을 실행할 수 있다.
+    await qr.startTransaction();
+
+    // 로직 실행
+    try {
+      const post = await this.postsService.createPost(userId, body);
+
+      for (let i = 0; i < body.images.length; i++) {
+        await this.postsService.createPostImage({
+          post,
+          order: i,
+          path: body.images[i],
+          type: ImageModelType.POST_IMAGE,
+        });
+      }
+
+      // 트랜잭션을 커밋한다.
+      // 트랜잭션 안에서 실행된 모든 데이터베이스 액션이 실제로 데이터베이스에 반영된다.
+      await qr.commitTransaction();
+      await qr.release();
+
+      return this.postsService.getPostById(post.id);
+    } catch (error) {
+      // 어떤 에러가 던져지면
+      // 트랜잭션을 종료하고 원래 상태로 되돌린댜.
+      await qr.rollbackTransaction();
+      await qr.release();
     }
-
-    return this.postsService.getPostById(post.id);
   }
 
   // 4. PATCH /posts/:id
