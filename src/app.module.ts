@@ -14,6 +14,7 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
+      envFilePath: '.env',
       isGlobal: true,
     }),
     PostsModule,
@@ -22,9 +23,9 @@ import { UsersModule } from './users/users.module';
       type: 'postgres',
       host: '127.0.0.1',
       port: 5432,
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
       entities: [PostsModel, UsersModel],
       synchronize: true,
     }),
