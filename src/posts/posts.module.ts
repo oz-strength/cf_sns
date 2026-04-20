@@ -10,6 +10,7 @@ import { ImageModel } from 'src/common/entity/image.entity';
 import { UsersModule } from 'src/users/users.module';
 import { v4 as uuid } from 'uuid';
 import { PostsModel } from './entities/posts.entity';
+import { PostsImagesService } from './image/images.service';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 @Module({
@@ -52,6 +53,6 @@ import { PostsService } from './posts.service';
     }),
   ],
   controllers: [PostsController],
-  providers: [PostsService],
+  providers: [PostsService, PostsImagesService],
 })
 export class PostsModule {}
