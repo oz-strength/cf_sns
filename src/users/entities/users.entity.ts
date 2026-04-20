@@ -1,8 +1,15 @@
 import { PostsModel } from 'src/posts/entities/posts.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { RolesEnum } from './const/roles.const';
 
-@Entity('users')
+@Entity()
 export class UsersModel {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -35,4 +42,10 @@ export class UsersModel {
 
   @OneToMany(() => PostsModel, (post) => post.author)
   posts!: PostsModel[];
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
+
+  @CreateDateColumn()
+  createdAt!: Date;
 }
