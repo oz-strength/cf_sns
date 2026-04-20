@@ -1,4 +1,4 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { IsEmail, IsString, Length } from 'class-validator';
 import { BaseModel } from 'src/common/entity/base.entity';
 import { emailValidationMessagse } from 'src/common/validation-message/email-validation.message';
@@ -21,11 +21,6 @@ export class UsersModel extends BaseModel {
   // 1) 길이가 20을 넘지 않을 것
   // 2) 유니크한 값일 것
   nickname!: string;
-
-  @Expose()
-  get nicknameAndEmail() {
-    return this.nickname + '/' + this.email;
-  }
 
   @Column({
     // 1)
