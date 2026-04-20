@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { HASH_ROUNDS, JWT_SECRET } from './const/auth.const';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 type TokenPayload = {
   email: string;
@@ -211,9 +212,7 @@ export class AuthService {
     return this.loginUser(existingUser);
   }
 
-  async registerWithEmail(
-    user: Pick<UsersModel, 'nickname' | 'email' | 'password'>,
-  ) {
+  async registerWithEmail(user: RegisterUserDto) {
     const hash = await bcrypt.hash(user.password, HASH_ROUNDS);
 
     const newUser = await this.usersService.createUser({
