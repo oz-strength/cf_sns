@@ -1,13 +1,7 @@
-import {
-  Body,
-  Controller,
-  Headers,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { BasicTokenGuard } from './guard/basic-token.guard';
+import { RefreshTokenGuard } from './guard/bearer-token.guard';
 import { MaxLengthPipe, MinLengthPipe } from './pipe/password.pipe';
 
 @Controller('auth')
@@ -16,6 +10,7 @@ export class AuthController {
 
   // refresh 토큰으로 access 토큰 재발급
   @Post('token/access')
+  @UseGuards(RefreshTokenGuard)
   postTokenAccess(@Headers('authorization') rawToken: string) {
     const token = this.authService.extractTokenFromHeader(rawToken, true);
 
@@ -31,6 +26,7 @@ export class AuthController {
 
   // refresh 토큰으로 refresh 토큰 재발급
   @Post('token/refresh')
+  @UseGuards(RefreshTokenGuard)
   postTokenRefresh(@Headers('authorization') rawToken: string) {
     const token = this.authService.extractTokenFromHeader(rawToken, true);
 
@@ -46,7 +42,7 @@ export class AuthController {
 
   @Post('login/email')
   @UseGuards(BasicTokenGuard)
-  postLoginEmail(@Headers('authorization') rawToken: string, @Request() req) {
+  postLoginEmail(@Headers('authorization') rawToken: string) {
     // email:password -> base64
     // aasdfklj'lwaeklfasjdl'f -> email:password
     const token = this.authService.extractTokenFromHeader(rawToken, false);
