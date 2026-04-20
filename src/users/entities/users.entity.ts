@@ -1,19 +1,10 @@
+import { BaseModel } from 'src/common/entity/base.entity';
 import { PostsModel } from 'src/posts/entities/posts.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { RolesEnum } from './const/roles.const';
 
 @Entity()
-export class UsersModel {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
+export class UsersModel extends BaseModel {
   @Column({
     // 1)
     length: 20,
@@ -42,10 +33,4 @@ export class UsersModel {
 
   @OneToMany(() => PostsModel, (post) => post.author)
   posts!: PostsModel[];
-
-  @UpdateDateColumn()
-  updatedAt!: Date;
-
-  @CreateDateColumn()
-  createdAt!: Date;
 }
