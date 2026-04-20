@@ -82,7 +82,25 @@ export class PostsService {
     }
   }
 
-  async pagePaginatePosts(dto: PaginatePostDto) {}
+  async pagePaginatePosts(dto: PaginatePostDto) {
+    /**
+     * data: Data[],
+     * total: number,
+     *
+     * [1] [2] [3] [4] [5]
+     */
+    const posts = await this.postsRepository.find({
+      skip: ((dto.page ?? 1) - 1) * dto.take,
+      take: dto.take,
+      order: {
+        createdAt: dto.order__createdAt,
+      },
+    });
+
+    return {
+      data: posts,
+    };
+  }
 
   async cursorPaginatePosts(dto: PaginatePostDto) {
     const where: FindOptionsWhere<PostsModel> = {};
@@ -174,6 +192,7 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException();
     }
+
     return post;
   }
 
