@@ -93,7 +93,10 @@ export class PostsService {
     // 해당되는 포스트가 0개 이상이면
     // 마지막 포스트를 가져오고
     // 아니면 null을 반환한다.
-    const lastItem = posts.length > 0 ? posts[posts.length - 1] : null;
+    const lastItem =
+      posts.length > 0 && posts.length === dto.take // 마지막 페이지즈음에 20개보다 작게 가져오면 다음 페이지 필요없음
+        ? posts[posts.length - 1]
+        : null;
 
     const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`);
 
@@ -108,7 +111,7 @@ export class PostsService {
       for (const key of Object.keys(dto)) {
         if (dto[key]) {
           if (key !== 'where__id_more_than') {
-            nextUrl.searchParams.append(key, dto[key]);
+            nextUrl.searchParams.append(key, dto[key]); // 정렬, 가져올데이터개수는 게속 url에 붙어있어야 한다.
           }
         }
       }
