@@ -27,6 +27,7 @@ import { PostsModel } from './posts/entities/posts.entity';
 import { PostsModule } from './posts/posts.module';
 import { UsersModel } from './users/entities/users.entity';
 import { UsersModule } from './users/users.module';
+import { ChatsModule } from './chats/chats.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     AuthModule,
     CommonModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [
