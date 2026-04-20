@@ -6,6 +6,7 @@ import { extname } from 'path';
 import { AuthModule } from 'src/auth/auth.module';
 import { CommonModule } from 'src/common/common.module';
 import { POST_IMAGE_PATH } from 'src/common/const/path.const';
+import { ImageModel } from 'src/common/entity/image.entity';
 import { UsersModule } from 'src/users/users.module';
 import { v4 as uuid } from 'uuid';
 import { PostsModel } from './entities/posts.entity';
@@ -13,7 +14,7 @@ import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PostsModel]),
+    TypeOrmModule.forFeature([PostsModel, ImageModel]),
     AuthModule,
     UsersModule,
     CommonModule,
