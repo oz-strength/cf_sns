@@ -25,12 +25,26 @@ export class CommonService {
     }
   }
 
+  // page 기반 pagination
   private async pagePaginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
     overrideFindOptions: FindManyOptions<T> = {},
-  ) {}
+  ) {
+    const findOptions = this.composeFindOptions<T>(dto);
 
+    const [data, count] = await repository.findAndCount({
+      ...findOptions,
+      ...overrideFindOptions,
+    });
+
+    return {
+      data,
+      total: count,
+    };
+  }
+
+  // cursor 기반 pagination
   private async cursorPaginate<T extends BaseModel>(
     dto: BasePaginationDto,
     repository: Repository<T>,
@@ -38,6 +52,8 @@ export class CommonService {
     path: string,
   ) {
     /**
+     * 정렬 조건이 달라지면 구현도 달라져야한다.
+     *
      * where__likeCount__more_than
      *
      * whre__title__ilike
