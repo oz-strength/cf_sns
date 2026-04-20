@@ -110,16 +110,18 @@ export class PostsService {
        */
       for (const key of Object.keys(dto)) {
         if (dto[key]) {
-          if (key !== 'where__id_more_than') {
+          if (key !== 'where__id_more_than' && key !== 'where__id_less_than') {
             nextUrl.searchParams.append(key, dto[key]); // 정렬, 가져올데이터개수는 게속 url에 붙어있어야 한다.
           }
         }
       }
 
-      nextUrl.searchParams.append(
-        'where__id_more_than',
-        lastItem.id.toString(),
-      );
+      const key =
+        dto.order__createdAt === 'ASC'
+          ? 'where__id_more_than'
+          : 'where__id_less_than';
+
+      nextUrl.searchParams.append(key, lastItem.id.toString());
     }
     /**
      * Response
