@@ -1,6 +1,7 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -13,6 +14,7 @@ import {
   ENV_DB_PORT_KEY,
   ENV_DB_USERNAME_KEY,
 } from './common/const/env-keys.const';
+import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { PostsModel } from './posts/entities/posts.entity';
 import { PostsModule } from './posts/posts.module';
 import { UsersModel } from './users/entities/users.entity';
@@ -25,6 +27,13 @@ import { UsersModule } from './users/users.module';
       isGlobal: true,
     }),
     PostsModule,
+    ServeStaticModule.forRoot({
+      // test.jpg
+      // http://localhost:3000/public/posts/test.jpg
+      // http://localhost:3000/posts/test.jpg
+      rootPath: PUBLIC_FOLDER_PATH,
+      serveRoot: '/public',
+    }),
     TypeOrmModule.forRoot({
       // 데이터베이스 타입
       type: 'postgres',
