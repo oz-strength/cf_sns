@@ -14,6 +14,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from './chats/entity/chats.entity';
+import { MessagesModel } from './chats/messages/entity/messages.entity';
 import { CommonModule } from './common/common.module';
 import {
   ENV_DB_DATABASE_KEY,
@@ -52,7 +53,7 @@ import { UsersModule } from './users/users.module';
       username: process.env[ENV_DB_USERNAME_KEY],
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
-      entities: [PostsModel, UsersModel, ImageModel, ChatsModel],
+      entities: [PostsModel, UsersModel, ImageModel, ChatsModel, MessagesModel],
       synchronize: true,
     }),
     UsersModule,
