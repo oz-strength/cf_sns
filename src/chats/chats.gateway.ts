@@ -1,4 +1,4 @@
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -9,6 +9,7 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-catch-http.exception-filter';
 import { ChatsService } from './chats.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { EnterChatDto } from './dto/enter-chat.dto';
@@ -42,6 +43,7 @@ export class ChatsGateway implements OnGatewayConnection {
       forbidNonWhitelisted: true, // 허용되지 않은 속성이 있으면 에러를 발생시킨다.
     }),
   )
+  @UseFilters(SocketCatchHttpExceptionFilter)
   @SubscribeMessage('create_chat')
   async createChat(
     @MessageBody() data: CreateChatDto,
