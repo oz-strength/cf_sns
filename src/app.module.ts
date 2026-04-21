@@ -26,6 +26,8 @@ import {
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { ImageModel } from './common/entity/image.entity';
 import { LogMiddleware } from './common/middleware/log.middleware';
+import { CommentsModule } from './posts/comments/comments.module';
+import { CommentsModel } from './posts/comments/entity/comments.entity';
 import { PostsModel } from './posts/entities/posts.entity';
 import { PostsModule } from './posts/posts.module';
 import { UsersModel } from './users/entities/users.entity';
@@ -53,13 +55,21 @@ import { UsersModule } from './users/users.module';
       username: process.env[ENV_DB_USERNAME_KEY],
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
-      entities: [PostsModel, UsersModel, ImageModel, ChatsModel, MessagesModel],
+      entities: [
+        PostsModel,
+        UsersModel,
+        ImageModel,
+        ChatsModel,
+        MessagesModel,
+        CommentsModel,
+      ],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     CommonModule,
     ChatsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [

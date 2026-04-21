@@ -6,6 +6,7 @@ import { BaseModel } from 'src/common/entity/base.entity';
 import { emailValidationMessagse } from 'src/common/validation-message/email-validation.message';
 import { lengthValidationMessage } from 'src/common/validation-message/length-validation.message';
 import { stringValidationMessage } from 'src/common/validation-message/string-validation.message';
+import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
 import { PostsModel } from 'src/posts/entities/posts.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { RolesEnum } from './const/roles.const';
@@ -73,4 +74,7 @@ export class UsersModel extends BaseModel {
 
   @OneToMany(() => MessagesModel, (message) => message.author)
   messages: MessagesModel;
+
+  @OneToMany(() => CommentsModel, (comment) => comment.author)
+  postComments: CommentsModel[];
 }
