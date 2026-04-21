@@ -61,6 +61,18 @@ export class ChatsGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('enter_chat')
+  @UseGuards(SocketBearerTokenGuard)
+  @UsePipes(
+    new ValidationPipe({
+      transform: true, // 값을 넣지 않아도 default 값이 형성되게 설정
+      transformOptions: {
+        enableImplicitConversion: true, // transformer의 @Type 없어도 자동으로 변환
+      },
+      whitelist: true, // DTO에 정의된 속성만 허용
+      forbidNonWhitelisted: true, // 허용되지 않은 속성이 있으면 에러를 발생시킨다.
+    }),
+  )
+  @UseFilters(SocketCatchHttpExceptionFilter)
   async enterChat(
     // 방의 chat ID들을 리스트로 받는다.
     @MessageBody() data: EnterChatDto,
@@ -82,9 +94,21 @@ export class ChatsGateway implements OnGatewayConnection {
 
   // socket.on('send_message', (message) => {console.log(message)});
   @SubscribeMessage('send_message')
+  @UseGuards(SocketBearerTokenGuard)
+  @UsePipes(
+    new ValidationPipe({
+      transform: true, // 값을 넣지 않아도 default 값이 형성되게 설정
+      transformOptions: {
+        enableImplicitConversion: true, // transformer의 @Type 없어도 자동으로 변환
+      },
+      whitelist: true, // DTO에 정의된 속성만 허용
+      forbidNonWhitelisted: true, // 허용되지 않은 속성이 있으면 에러를 발생시킨다.
+    }),
+  )
+  @UseFilters(SocketCatchHttpExceptionFilter)
   async sendMessage(
     @MessageBody() dto: CreateMessagesDto,
-    @ConnectedSocket() socket: Socket,
+    @ConnectedSocket() socket: Socket & { user: UsersModel },
   ) {
     const chatExists = await this.chatsService.checkIfChatExists(dto.chatId);
 
@@ -95,7 +119,10 @@ export class ChatsGateway implements OnGatewayConnection {
       });
     }
 
-    const message = await this.messagesService.createMessage(dto);
+    const message = await this.messagesService.createMessage(
+      dto,
+      socket.user.id,
+    );
 
     socket
       .to(message!.chat.id.toString())
