@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -14,6 +15,7 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { CommentsService } from './comments.service';
 import { CreateCommentsDto } from './dto/create-comments.dto';
 import { PaginateCommentsDto } from './dto/paginate-comments.dto';
+import { UpdateCommentsDto } from './dto/update-comments.dto';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
@@ -58,5 +60,14 @@ export class CommentsController {
     @User() user: UsersModel,
   ) {
     return this.commentsService.createComment(body, postId, user);
+  }
+
+  @Patch(':commentId')
+  @UseGuards(AccessTokenGuard)
+  async patchComment(
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @Body() body: UpdateCommentsDto,
+  ) {
+    return this.commentsService.updateComment(body, commentId);
   }
 }
