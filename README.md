@@ -445,13 +445,4 @@ yarn.cmd build
 | 타입 엄격성 | `noImplicitAny: false` | 점진적으로 `strict` 옵션 강화 |
 | API 문서화 | README 표 중심 | Swagger 또는 OpenAPI 문서 추가 |
 
-## 검증 메모
-
-README 작성 시 실제 코드 기준으로 기능과 개념을 맞췄습니다. 다만 이 문서는 테스트 통과를 주장하지 않습니다. 검증은 다음 명령으로 수행할 수 있습니다.
-
-```bash
-yarn.cmd test --runInBand
-yarn.cmd build
-```
-
 현재 프로젝트는 NestJS 학습 과정에서 다양한 프레임워크 기능을 직접 실험한 결과물입니다. Guard, Decorator, Interceptor, DTO, TypeORM Relation, WebSocket Gateway를 각각 따로 보는 데서 끝내지 않고 실제 API 흐름 안에서 연결해보는 데 초점을 맞췄습니다.
