@@ -2,10 +2,13 @@ import {
   BadRequestException,
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PostsService } from '../posts.service';
 
+@Injectable()
 export class IsPostMineOrAdminGuard implements CanActivate {
   constructor(private readonly postService: PostsService) {}
 
@@ -31,6 +34,11 @@ export class IsPostMineOrAdminGuard implements CanActivate {
       throw new BadRequestException(`포스트ID가 파라미터로 제공돼야합니다.`);
     }
 
-    return this.postService.isPostMine(user.id, Number(postId));
+    const isOk = await this.postService.isPostMine(user.id, Number(postId));
+    if (!isOk) {
+      throw new ForbiddenException(`해당 포스트에 대한 권한이 없습니다.`);
+    }
+
+    return true;
   }
 }

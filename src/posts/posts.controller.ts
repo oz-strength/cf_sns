@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { IsPublic } from 'src/common/decorator/is-public-decorator';
@@ -23,6 +24,7 @@ import { DataSource } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { IsPostMineOrAdminGuard } from './guard/is-post-mine-or-admin.guard';
 import { PostsImagesService } from './image/images.service';
 import { PostsService } from './posts.service';
 
@@ -90,9 +92,10 @@ export class PostsController {
 
   // 4. PATCH /posts/:id
   // id에 해당하는 post의 내용을 수정하는 API
-  @Patch(':id')
+  @Patch(':postId')
+  @UseGuards(IsPostMineOrAdminGuard)
   patchPost(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('postId', ParseIntPipe) id: number,
     @Body() body: UpdatePostDto,
     // @Body('title') title?: string,
     // @Body('content') content?: string,
