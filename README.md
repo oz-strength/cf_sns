@@ -223,6 +223,26 @@ sequenceDiagram
 
 `src/chats/chats.gateway.ts`에서 Socket.IO namespace를 `chats`로 분리했습니다. HTTP Guard를 그대로 붙이는 대신 handshake header의 Bearer Token을 직접 검증하고, 검증된 사용자를 `socket.user`에 저장합니다.
 
+## 트러블슈팅
+
+### 1. 공통 페이지네이션 추상화와 WebSocket Validation 처리
+
+처음에는 게시글, 댓글, 채팅 메시지처럼 목록 조회가 필요한 기능마다 페이지네이션 로직을 각각 구현했습니다. 하지만 `take`, `page`, `where__id__more_than`, `where__id__less_than`, `order__createdAt`처럼 반복되는 쿼리 규칙이 많아졌고, 같은 로직이 여러 서비스에 흩어지는 문제가 생겼습니다.
+
+이를 해결하기 위해 `CommonService.paginate<T extends BaseModel>()`를 만들고, TypeORM의 `Repository<T>`, `FindManyOptions<T>`, `FindOptionsWhere<T>`, `FindOptionsOrder<T>`를 활용해 엔티티 타입에 상관없이 재사용 가능한 페이지네이션 구조로 추상화했습니다. 이 과정에서 단순히 함수를 공통화하는 것보다, TypeScript generic을 사용해 "BaseModel을 상속한 엔티티만 페이지네이션 대상으로 받는다"는 제약을 주는 방식이 더 안전하다는 점을 학습했습니다.
+
+또 하나 어려웠던 부분은 REST API에서는 전역 `ValidationPipe`가 정상적으로 적용되지만, WebSocket Gateway의 message handler에는 같은 방식으로 기대한 검증 흐름이 적용되지 않는다는 점이었습니다. HTTP 요청과 WebSocket 이벤트는 NestJS 안에서도 실행 컨텍스트가 다르기 때문에, Gateway에서는 `@UsePipes(new ValidationPipe(...))`를 각 `@SubscribeMessage()` 메서드에 명시적으로 적용했습니다.
+
+WebSocket 예외 처리도 HTTP와 달랐습니다. REST API에서는 `HttpException` 계열 예외가 HTTP 응답으로 변환되지만, WebSocket에서는 그대로 클라이언트 이벤트 응답으로 변환되지 않았습니다. 그래서 `SocketCatchHttpExceptionFilter`를 만들어 HTTP 예외가 발생했을 때 WebSocket에서 처리 가능한 `WsException` 형태로 변환하도록 구성했습니다. 이 과정에서 NestJS의 Pipe, Exception Filter가 프로토콜별 execution context에 따라 다르게 동작한다는 점을 이해할 수 있었습니다.
+
+### 2. WebSocket 인증 상태 관리 방식
+
+REST API에서는 요청마다 `AccessTokenGuard`가 실행되고, 매 요청의 Authorization header를 검증한 뒤 `req.user`를 주입합니다. 처음에는 WebSocket에서도 같은 방식으로 각 이벤트마다 Guard를 붙이는 구조를 떠올렸지만, Socket.IO는 한 번 연결된 뒤 같은 socket으로 여러 이벤트를 주고받기 때문에 REST API와 동일하게 매번 요청 단위 인증을 처리하는 방식이 자연스럽지 않았습니다.
+
+그래서 `ChatsGateway.handleConnection()`에서 handshake header의 Bearer Token을 검증하고, 검증된 사용자 정보를 `socket.user`에 저장했습니다. 이후 `enter_chat`, `send_message` 같은 이벤트 핸들러에서는 연결 시점에 저장된 사용자 정보를 재사용합니다.
+
+이 방식으로 WebSocket 연결이 유지되는 동안 인증된 사용자 컨텍스트를 socket에 보관할 수 있었습니다. 동시에 HTTP의 `req.user`와 WebSocket의 `socket.user`가 같은 목적을 가지지만 생명주기가 다르다는 점도 학습했습니다. HTTP는 요청마다 짧게 생성되고 끝나는 context이고, WebSocket은 연결이 유지되는 동안 같은 socket context가 지속됩니다.
+
 ## NestJS / TypeScript 학습 포인트
 
 | 개념 | 사용 위치 | 학습/설계 의도 |
