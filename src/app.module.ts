@@ -6,7 +6,7 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -31,6 +31,7 @@ import { CommentsModel } from './posts/comments/entity/comments.entity';
 import { PostsModel } from './posts/entities/posts.entity';
 import { PostsModule } from './posts/posts.module';
 import { UsersModel } from './users/entities/users.entity';
+import { RolesGuard } from './users/guard/roles.guard';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -77,6 +78,10 @@ import { UsersModule } from './users/users.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })
