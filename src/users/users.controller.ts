@@ -1,4 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
+import { Roles } from './decorator/roles.decorator';
+import { RolesEnum } from './entities/const/roles.const';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -6,6 +8,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @Roles(RolesEnum.ADMIN) // 이 API는 ADMIN 권한이 있는 사용자만 접근 가능
   /**
    * serialization -> 직렬화 -> 현재 시스템에서 사용되는 (NestJS) 데이터의 구조를 다른 시스템에서도 쉽게
    *                            사용할 수 있는 포맷으로 변환
