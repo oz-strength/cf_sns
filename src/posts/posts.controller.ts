@@ -15,7 +15,9 @@ import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { ImageModelType } from 'src/common/entity/image.entity';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { Roles } from 'src/users/decorator/roles.decorator';
 import { User } from 'src/users/decorator/user.decorator';
+import { RolesEnum } from 'src/users/entities/const/roles.const';
 import { UsersModel } from 'src/users/entities/users.entity';
 import type { QueryRunner as QR } from 'typeorm';
 import { DataSource } from 'typeorm';
@@ -102,7 +104,11 @@ export class PostsController {
   // 5. DELETE /posts/:id
   // id에 해당하는 post를 삭제하는 API
   @Delete(':id')
+  @UseGuards(AccessTokenGuard)
+  @Roles(RolesEnum.ADMIN)
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }
+
+  // RBAC - Role Based Access Control
 }
