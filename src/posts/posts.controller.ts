@@ -12,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
+import { IsPublic } from 'src/common/decorator/is-public-decorator';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { ImageModelType } from 'src/common/entity/image.entity';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
@@ -38,6 +39,7 @@ export class PostsController {
   // 1. GET /posts
   // 모든 post를 반환하는 API
   @Get()
+  @IsPublic() // 이 API는 인증이 필요없음
   // @UseInterceptors(LogInterceptor)
   getPosts(@Query() query: PaginatePostDto) {
     return this.postsService.paginatePosts(query);
@@ -55,6 +57,7 @@ export class PostsController {
   // 2. GET /posts/:id
   // id에 해당하는 post를 반환하는 API
   @Get(':id')
+  @IsPublic() // 이 API는 인증이 필요없음
   getPost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.getPostById(id);
   }
@@ -64,7 +67,6 @@ export class PostsController {
   //
   // DTO - Data Transfer Object
   @Post()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(TransactionInterceptor)
   async postPosts(
     @User('id') userId: number,
@@ -104,7 +106,6 @@ export class PostsController {
   // 5. DELETE /posts/:id
   // id에 해당하는 post를 삭제하는 API
   @Delete(':id')
-  @UseGuards(AccessTokenGuard)
   @Roles(RolesEnum.ADMIN)
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
