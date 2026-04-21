@@ -8,10 +8,8 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { IsPublic } from 'src/common/decorator/is-public-decorator';
 import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 import { ImageModelType } from 'src/common/entity/image.entity';
@@ -47,7 +45,6 @@ export class PostsController {
 
   // POST /posts/random
   @Post('random')
-  @UseGuards(AccessTokenGuard)
   async postPostsRandom(@User() user: UsersModel) {
     await this.postsService.generatePosts(user.id);
 
