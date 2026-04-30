@@ -3,8 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
 import { ImageModel } from 'src/common/entity/image.entity';
-import { FindOptionsWhere, LessThan, MoreThan, Repository } from 'typeorm';
-import { QueryRunner } from 'typeorm/browser';
+import {
+  FindOptionsWhere,
+  LessThan,
+  MoreThan,
+  QueryRunner,
+  Repository,
+} from 'typeorm';
 import { DEFAULT_POST_FIND_OPTIONS } from './const/default-post-find-options.const';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
@@ -182,6 +187,18 @@ export class PostsService {
     return qr
       ? qr.manager.getRepository<PostsModel>(PostsModel)
       : this.postsRepository;
+  }
+
+  async incrementCommentCount(postId: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr);
+
+    await repository.increment({ id: postId }, 'commentCount', 1);
+  }
+
+  async decrementCommentCount(postId: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr);
+
+    await repository.decrement({ id: postId }, 'commentCount', 1);
   }
 
   async createPost(authorId: number, postDto: CreatePostDto, qr?: QueryRunner) {

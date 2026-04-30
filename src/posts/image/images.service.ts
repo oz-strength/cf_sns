@@ -4,8 +4,7 @@ import { promises } from 'fs';
 import { basename, join } from 'path/win32';
 import { POST_IMAGE_PATH, TEMP_FOLDER_PATH } from 'src/common/const/path.const';
 import { ImageModel } from 'src/common/entity/image.entity';
-import { Repository } from 'typeorm';
-import { QueryRunner } from 'typeorm/browser';
+import { QueryRunner, Repository } from 'typeorm';
 import { CreatePostImageDto } from './dto/create-image.dto';
 @Injectable()
 export class PostsImagesService {
