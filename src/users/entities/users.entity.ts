@@ -10,6 +10,7 @@ import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
 import { PostsModel } from 'src/posts/entities/posts.entity';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { RolesEnum } from './const/roles.const';
+import { UserFollowersModel } from './user-followers.entity';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -70,11 +71,19 @@ export class UsersModel extends BaseModel {
 
   @ManyToMany(() => ChatsModel, (chat) => chat.users)
   @JoinTable()
-  chats: ChatsModel[];
+  chats!: ChatsModel[];
 
   @OneToMany(() => MessagesModel, (message) => message.author)
-  messages: MessagesModel;
+  messages!: MessagesModel;
 
   @OneToMany(() => CommentsModel, (comment) => comment.author)
-  postComments: CommentsModel[];
+  postComments!: CommentsModel[];
+
+  @OneToMany(() => UserFollowersModel, (ufm) => ufm.follower)
+  // 내가 팔로우 하고 있는 사람들
+  followers!: UserFollowersModel[];
+
+  @OneToMany(() => UserFollowersModel, (ufm) => ufm.followee)
+  // 나를 팔로우 하고 있는 사람들
+  followees!: UserFollowersModel[];
 }

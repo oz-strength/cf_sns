@@ -31,6 +31,7 @@ import { CommentsModule } from './posts/comments/comments.module';
 import { CommentsModel } from './posts/comments/entity/comments.entity';
 import { PostsModel } from './posts/entities/posts.entity';
 import { PostsModule } from './posts/posts.module';
+import { UserFollowersModel } from './users/entities/user-followers.entity';
 import { UsersModel } from './users/entities/users.entity';
 import { RolesGuard } from './users/guard/roles.guard';
 import { UsersModule } from './users/users.module';
@@ -60,6 +61,7 @@ import { UsersModule } from './users/users.module';
       entities: [
         PostsModel,
         UsersModel,
+        UserFollowersModel,
         ImageModel,
         ChatsModel,
         MessagesModel,
